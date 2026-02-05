@@ -12,14 +12,8 @@ declare global {
   // eslint-disable-next-line no-var
   var mongooseCache: MongooseCache | undefined;
 }
-
-// Get MongoDB URI from environment variables
-const MONGODB_URI: string | undefined = process.env.MONGODB_URI;
-
-
-
 // Initialize the cached connection object
-// In development, use a g\lobal variable to preserve the connection across hot reloads
+// In development, use a global variable to preserve the connection across hot reloads
 // In production, the cache will be scoped to this module
 const cached: MongooseCache = global.mongooseCache || {
   conn: null,
@@ -37,6 +31,9 @@ if (!global.mongooseCache) {
  * @throws Error if connection fails
  */
 async function connectDB(): Promise<typeof mongoose> {
+
+  // Get MongoDB URI from environment variables
+  const MONGODB_URI: string | undefined = process.env.MONGODB_URI;
   // If we already have an active connection, return it immediately
   if (cached.conn) {
     return cached.conn;
