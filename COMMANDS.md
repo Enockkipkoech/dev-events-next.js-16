@@ -10,6 +10,9 @@
 `Create a new file lib/constants.ts in the root lib folder. This file should export an array named events containing real upcoming or popular developer conferences, hackathons, or tech meeteups in Kenya. Use image paths from public/images for the image field. Make sure the data looks realistic and can be directly imported and used in the EventCard component(components/EventCard)`
 
 2. MongoDB Connection Setup
+
+<!-- ************************************************************************ -->
+
 ```
 You are a backend developer working on a Next.js application with Mongoose and TypeScript. 
 
@@ -21,6 +24,8 @@ Your task is to,
 - Make sure the code is clean, readable, and production-ready.
 
 ```
+<!-- ************************************************************************ -->
+
 
 3. Models Creation
 
