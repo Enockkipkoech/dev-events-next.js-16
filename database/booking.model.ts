@@ -26,7 +26,7 @@ const BookingSchema = new Schema<IBooking>(
       validate: {
         validator: function (email: string): boolean {
           // RFC 5322 compliant email validation regex
-           const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+          const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
           return emailRegex.test(email);
         },
         message: "Please provide a valid email address",
@@ -39,7 +39,7 @@ const BookingSchema = new Schema<IBooking>(
 );
 
 // Pre-save hook to validate events exists before creating booking
-BookingSchema.pre('save', async function (next:any) {
+BookingSchema.pre('save', async function (next: any) {
   const booking = this as IBooking;
 
   // Only validate eventId if it's new or modified
@@ -62,8 +62,6 @@ BookingSchema.pre('save', async function (next:any) {
   next();
 });
 
-// Create index on eventId for faster queries
-BookingSchema.index({ eventId: 1 });
 
 // Create compound index for common queries (events bookings by date)
 BookingSchema.index({ eventId: 1, createdAt: -1 });

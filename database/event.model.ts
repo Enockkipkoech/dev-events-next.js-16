@@ -66,6 +66,7 @@ const EventSchema = new Schema<IEvent>(
       type: String,
       required: [true, "Date is required"],
       trim: true,
+
     },
     time: {
       type: String,
@@ -112,7 +113,7 @@ const EventSchema = new Schema<IEvent>(
 );
 
 // Pre-save hook for slug generation and data normalization
-EventSchema.pre('save', function (next:any) {
+EventSchema.pre('save', function () {
   const event = this as IEvent;
 
   // Generate slug only if title changed or document is new
@@ -130,7 +131,6 @@ EventSchema.pre('save', function (next:any) {
     event.time = normalizeTime(event.time);
   }
 
-  next();
 });
 
 // Helper function to generate URL-friendly slug from title
@@ -159,33 +159,27 @@ function normalizeTime(timeString: string): string {
   // Handle various time formats and convert to HH:MM (24-hour format)
   const timeRegex = /^(\d{1,2}):(\d{2})(\s*(AM|PM))?$/i;
   const match = timeString.trim().match(timeRegex);
-  
+
   if (!match) {
     throw new Error('Invalid time format. Use HH:MM or HH:MM AM/PM');
   }
-  
+
   let hours = parseInt(match[1]);
   const minutes = match[2];
   const period = match[4]?.toUpperCase();
-  
+
   if (period) {
     // Convert 12-hour to 24-hour format
     if (period === 'PM' && hours !== 12) hours += 12;
     if (period === 'AM' && hours === 12) hours = 0;
   }
-  
+
   if (hours < 0 || hours > 23 || parseInt(minutes) < 0 || parseInt(minutes) > 59) {
     throw new Error('Invalid time values');
   }
-  
+
   return `${hours.toString().padStart(2, '0')}:${minutes}`;
 }
-
-// Create unique index on slug for better performance
-EventSchema.index({ slug: 1 }, { unique: true });
-
-// Create compound index for common queries
-EventSchema.index({ date: 1, mode: 1 });
 
 // Export the model (reuse existing model in development to prevent OverwriteModelError)
 const Event = models.Event || model<IEvent>("Event", EventSchema);

@@ -99,7 +99,7 @@
 }
 
 @utility glass {
-  @apply bg-[#12121280]/50 rounded-md bg-clip-padding backdrop-filter backdrop-blur-xl border-b border-border-dark;
+  @apply bg-[#12121280]/90 rounded-md bg-clip-padding backdrop-filter backdrop-blur-xl border-b border-border-dark;
 }
 
 @utility card-shadow {
@@ -108,7 +108,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
 
   body {
@@ -129,6 +129,10 @@
 
   ul {
     @apply list-disc list-inside;
+  }
+  
+  *:focus-visible {
+    @apply outline outline-2 outline-ring/50;
   }
 }
 
@@ -226,6 +230,8 @@
 
         .signup-card {
           @apply bg-dark-100 border-dark-200 card-shadow flex w-full flex-col gap-6 rounded-[10px] border px-5 py-6;
+          position: relative;
+          z-index: 20;
         }
       }
     }

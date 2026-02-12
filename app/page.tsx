@@ -1,9 +1,30 @@
 import EventCard from "@/components/EventCard"
 import ExploreBtn from "@/components/ExploreBtn"
-import { events } from "@/lib/constants"
+import { IEvent } from "@/database";
 
 
-const Home = () => {
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
+
+const Home = async () => {
+  let events: IEvent[] = [];
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/events`, { cache: 'no-store' });
+
+    // Check if response is successful before parsing JSON
+    if (!response.ok) {
+      console.error(`Failed to fetch events: HTTP ${response.status}`);
+      // Fallback to empty events array
+    } else {
+      const data = await response.json();
+      events = data.events || [];
+    }
+  } catch (error) {
+    // Handle network failures and JSON parse errors
+    console.error('Error fetching events:', error instanceof Error ? error.message : String(error));
+    // Fallback to empty events array
+  }
+
   return (
     <section>
       <h1 className="text-center">
@@ -17,8 +38,8 @@ const Home = () => {
         <h3>Featured Events</h3>
 
         <ul className="events">
-          {events.map((event, index) => (
-            <li key={event.title}>
+          {events && events.length > 0 && events.map((event: IEvent, index: any) => (
+            <li key={event.title} className="list-none">
               <EventCard {...event} />
             </li>
           ))}
