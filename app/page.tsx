@@ -9,12 +9,12 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
 const Home = async () => {
   "use cache";
   cacheTag("events");
-  cacheLife("seconds");
+  // cacheLife("seconds");
   let events: IEvent[] = [];
 
   try {
 
-    const response = await fetch(`${BASE_URL}/api/events`, { cache: 'no-store' });
+    const response = await fetch(`${BASE_URL}/api/events`, { cache: 'default' });
 
     // Check if response is successful before parsing JSON
     if (!response.ok) {
