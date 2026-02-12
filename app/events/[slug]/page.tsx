@@ -1,3 +1,5 @@
+import BookEvent from '@/components/BookEvent';
+import { Book } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
 
@@ -30,7 +32,7 @@ const EventAgendaItem = ({ agendaItems }: { agendaItems: string[] }) => (
 const EventTag = ({ tags }: { tags: string[] }) => (
     <div className="flex flex-row gap-1.5 flex-wrap">
         {tags.map((tag) => (
-            <div key={tag} className="pill">   {tag} </div>
+            <div className="pill" key={tag}>   {tag} </div>
         ))}
 
     </div>
@@ -39,7 +41,7 @@ const EventTag = ({ tags }: { tags: string[] }) => (
 const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
 
     const { slug } = await params;
-    const request = await fetch(`${BASE_URL}/api/events/${slug}`, { cache: 'no-store', next: { revalidate: 60 } });
+    const request = await fetch(`${BASE_URL}/api/events/${slug}`, { cache: 'no-store' });
 
     // Check if request was successful before parsing JSON
     if (!request.ok) {
@@ -61,58 +63,13 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
     }
 
     // Safely parse agenda - handle missing, non-array, or malformed agenda
-    let agendaArray: string[] = [];
-    if (agenda) {
-        if (Array.isArray(agenda)) {
-            agendaArray = agenda as string[];
-        } else if (typeof agenda === 'string') {
-            try {
-                const parsed = JSON.parse(agenda);
-                if (Array.isArray(parsed)) {
-                    agendaArray = parsed as string[];
-                } else {
-                    // Fallback to splitting string on commas or semicolons
-                    agendaArray = agenda
-                        .split(/[,;]/)
-                        .map(item => item.trim())
-                        .filter(item => item.length > 0);
-                }
-            } catch {
-                // JSON parse failed, split on commas or semicolons
-                agendaArray = agenda
-                    .split(/[,;]/)
-                    .map(item => item.trim())
-                    .filter(item => item.length > 0);
-            }
-        }
-    }
+    const agendaArray: string[] = Array.isArray(agenda[0]) ? [agenda[0]] : JSON.parse(`[${agenda[0].trim()}]`);
 
-    // Safely parse tags - handle missing, non-array, or malformed tags
-    let tagsArray: string[] = [];
-    if (tags) {
-        if (Array.isArray(tags)) {
-            tagsArray = tags as string[];
-        } else if (typeof tags === 'string') {
-            try {
-                const parsed = JSON.parse(tags);
-                if (Array.isArray(parsed)) {
-                    tagsArray = parsed as string[];
-                } else {
-                    // Fallback to splitting string on commas or semicolons
-                    tagsArray = tags
-                        .split(/[,;]/)
-                        .map(item => item.trim())
-                        .filter(item => item.length > 0);
-                }
-            } catch {
-                // JSON parse failed, split on commas or semicolons
-                tagsArray = tags
-                    .split(/[,;]/)
-                    .map(item => item.trim())
-                    .filter(item => item.length > 0);
-            }
-        }
-    }
+    const formattedTags = JSON.parse(`${tags[0].trim()}`);
+
+    const bookings = 20; // Placeholder for number of bookings - replace with actual data when available
+    const availabeSpots = 50;
+
 
     return (
         <section id="event">
@@ -147,14 +104,25 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
                         <p>{organizer}</p>
                     </section>
 
-                    <EventTag tags={tagsArray} />
+                    <EventTag tags={formattedTags} />
 
 
                 </div>
 
                 {/* {Right side - Booking form} */}
                 <aside className="booking">
-                    <p className="text-lg font-semibold">Book Your Spot</p>
+                    <div className="signup-card">
+                        <h2>Book Your Spot</h2>
+                        {
+                            bookings > 0 ? (
+                                <p className="text-sm">{availabeSpots} spots left. Join over {bookings}  people who have already booked their spot!</p>
+                            ) : (
+                                <p className="text-sm">Be the first to book! Discount available for first 10 bookings.</p>)
+                        }
+
+                        <BookEvent />
+
+                    </div>
 
                 </aside>
             </div>
