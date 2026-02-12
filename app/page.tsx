@@ -10,7 +10,7 @@ const Home = async () => {
 
   try {
     const response = await fetch(`${BASE_URL}/api/events`, { cache: 'no-store' });
-    
+
     // Check if response is successful before parsing JSON
     if (!response.ok) {
       console.error(`Failed to fetch events: HTTP ${response.status}`);
@@ -39,7 +39,7 @@ const Home = async () => {
 
         <ul className="events">
           {events && events.length > 0 && events.map((event: IEvent, index: any) => (
-            <li key={event.title}>
+            <li key={event.title} className="list-none">
               <EventCard {...event} />
             </li>
           ))}

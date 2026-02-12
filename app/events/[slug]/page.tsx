@@ -1,4 +1,7 @@
 import BookEvent from '@/components/BookEvent';
+import EventCard from '@/components/EventCard';
+import { IEvent } from '@/database';
+import { getSimilarEventsBySlug } from '@/lib/actions/event.actions';
 import { Book } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
@@ -63,13 +66,15 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
     }
 
     // Safely parse agenda - handle missing, non-array, or malformed agenda
-    const agendaArray: string[] = Array.isArray(agenda[0]) ? [agenda[0]] : JSON.parse(`[${agenda[0].trim()}]`);
+    const agendaArray: string[] = Array.isArray(agenda) ? agenda : (typeof agenda === 'string' ? [agenda] : []);
 
-    const formattedTags = JSON.parse(`${tags[0].trim()}`);
+    const formattedTags = Array.isArray(tags) ? tags : (typeof tags === 'string' ? [tags] : []);
 
     const bookings = 20; // Placeholder for number of bookings - replace with actual data when available
     const availabeSpots = 50;
 
+    const rawSimilarEvents: IEvent[] = (await getSimilarEventsBySlug(slug)).events || [];
+    const similarEvents: IEvent[] = JSON.parse(JSON.stringify(rawSimilarEvents));
 
     return (
         <section id="event">
@@ -125,6 +130,17 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
                     </div>
 
                 </aside>
+            </div>
+
+            <div className="flex w-full flex-col gap-4 pt-20">
+                <h2>Similar Events</h2>
+                <div className="events">
+                    {similarEvents && similarEvents.map((similarEvent: IEvent) => (
+                        <EventCard key={similarEvent._id.toString()} {...similarEvent} />
+                    ))}
+
+                </div>
+
             </div>
 
         </section >

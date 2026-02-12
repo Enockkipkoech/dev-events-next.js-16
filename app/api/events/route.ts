@@ -13,11 +13,22 @@ export async function POST(request: NextRequest) {
 
         try {
             event = Object.fromEntries(formData.entries());
-            console.log('Received form data:', event);
 
-            //TODO: Sanitize data - arrays, strings, numbers, dates, etc. and validate required fields
+            // TODO: Sanitize data - arrays, strings, numbers, dates, etc. and validate required fields
+            event.tags = typeof event.tags === "string" ? JSON.parse(event.tags as unknown as string) : event.tags;
+
+            if (event.agenda) {
+                const agendaData = typeof event.agenda === "string" ? JSON.parse(event.agenda as unknown as string) : event.agenda;
+                event.agenda = Array.isArray(agendaData) ? agendaData : [agendaData];
+            } else {
+                event.agenda = [];
+            }
+
+
+
 
         } catch (error) {
+            console.error('Error parsing form data:', error);
             return NextResponse.json({ message: 'Invalid JSON form data', error: error instanceof Error ? error.message : String(error) }, { status: 400 });
 
         }
@@ -40,7 +51,7 @@ export async function POST(request: NextRequest) {
         event.image = (uploadResult as { secure_url: string }).secure_url;
 
         // Create and save the new event to the database
-        const newEvent: IEvent = await Event.create(event);
+        const newEvent: IEvent = await Event.create({ ...event } as IEvent);
 
         return NextResponse.json({ message: 'API event created successfully', event: newEvent }, { status: 201 });
 
