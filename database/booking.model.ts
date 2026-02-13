@@ -5,6 +5,7 @@ import Event from './event.model';
 export interface IBooking extends Document {
   eventId: Types.ObjectId;
   email: string;
+  slug: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +32,11 @@ const BookingSchema = new Schema<IBooking>(
         },
         message: "Please provide a valid email address",
       },
+    },
+    slug: {
+      type: String,
+      required: [true, "Slug is required"],
+      trim: true,
     },
   },
   {
@@ -59,7 +65,6 @@ BookingSchema.pre('save', async function (next: any) {
     }
   }
 
-  next();
 });
 
 

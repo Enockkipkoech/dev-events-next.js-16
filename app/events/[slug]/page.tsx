@@ -1,8 +1,8 @@
 import BookEvent from '@/components/BookEvent';
 import EventCard from '@/components/EventCard';
 import { IEvent } from '@/database';
-import { getSimilarEventsBySlug } from '@/lib/actions/event.actions';
-import { Book } from 'lucide-react';
+import { getEventBySlug, getSimilarEventsBySlug } from '@/lib/actions/event.actions';
+import { cacheLife } from 'next/cache';
 import { notFound } from 'next/navigation';
 
 
@@ -44,7 +44,8 @@ const EventTag = ({ tags }: { tags: string[] }) => (
 const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
 
     const { slug } = await params;
-    const request = await fetch(`${BASE_URL}/api/events/${slug}`, { cache: 'no-store' });
+    // const { success, message, data } = await getEventBySlug(slug);
+    const request = await fetch(`${BASE_URL}/api/events/${slug}`);
 
     // Check if request was successful before parsing JSON
     if (!request.ok) {
@@ -53,12 +54,8 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
 
     const data = await request.json();
 
-    // Validate response structure
-    if (!data || !data.event) {
-        return notFound();
-    }
 
-    const { event: { title, description, image, overview, venue, location, date, time, mode, audience, agenda, organizer, tags, } } = data;
+    const { event: { _id, title, description, image, overview, venue, location, date, time, mode, audience, agenda, organizer, tags, } } = data;
 
     // Validate required fields
     if (!description || !title) {
@@ -73,7 +70,7 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
     const bookings = 20; // Placeholder for number of bookings - replace with actual data when available
     const availabeSpots = 50;
 
-    const rawSimilarEvents: IEvent[] = (await getSimilarEventsBySlug(slug)).events || [];
+    const rawSimilarEvents: IEvent[] = (await getSimilarEventsBySlug(slug)).data || [];
     const similarEvents: IEvent[] = JSON.parse(JSON.stringify(rawSimilarEvents));
 
     return (
@@ -125,7 +122,7 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
                                 <p className="text-sm">Be the first to book! Discount available for first 10 bookings.</p>)
                         }
 
-                        <BookEvent />
+                        <BookEvent eventId={_id.toString()} slug={slug} />
 
                     </div>
 

@@ -1,14 +1,37 @@
 "use client";
 
+import { createBooking } from "@/lib/actions/bookings.actions";
+import posthog from "posthog-js";
 import { useState } from "react";
 
-const BookEvent = () => {
+const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
     const [email, setEmail] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState("");
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        console.log("BookEvent props:", { eventId, slug, email });
+        const { success, message } = await createBooking({ eventId, slug, email });
+
+        if (success) {
+            setSubmitted(true);
+            //Track booking event with analytics
+            posthog.capture("booking_created", {
+                eventId,
+                slug,
+                email
+            });
+        } else {
+            setError("Failed to create booking. Please try again.");
+            console.error("Booking error:", message);
+            posthog.captureException(new Error(message), {
+                context: {
+                    eventId, slug, email
+                }
+            });
+        }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

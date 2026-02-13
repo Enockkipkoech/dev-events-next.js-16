@@ -7,14 +7,15 @@ import { cacheLife, cacheTag } from "next/cache";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
 
 const Home = async () => {
-  "use cache";
-  cacheTag("events");
-  // cacheLife("seconds");
+  // "use cache";
+  // cacheTag("events");
+  // cacheLife("hours");
   let events: IEvent[] = [];
 
   try {
 
-    const response = await fetch(`${BASE_URL}/api/events`, { cache: 'default' });
+
+    const response = await fetch(`${BASE_URL}/api/events`);
 
     // Check if response is successful before parsing JSON
     if (!response.ok) {
