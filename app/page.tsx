@@ -7,9 +7,9 @@ import { cacheLife, cacheTag } from "next/cache";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
 
 const Home = async () => {
-  // "use cache";
-  // cacheTag("events");
-  // cacheLife("hours");
+  "use cache";
+  cacheTag("events");
+  cacheLife("minutes");
   let events: IEvent[] = [];
 
   try {

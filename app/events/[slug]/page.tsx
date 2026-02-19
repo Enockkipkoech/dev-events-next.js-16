@@ -2,8 +2,8 @@ import BookEvent from '@/components/BookEvent';
 import EventCard from '@/components/EventCard';
 import { IEvent } from '@/database';
 import { getEventBySlug, getSimilarEventsBySlug } from '@/lib/actions/event.actions';
-import { cacheLife } from 'next/cache';
 import { notFound } from 'next/navigation';
+import { Suspense } from "react";
 
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -41,21 +41,41 @@ const EventTag = ({ tags }: { tags: string[] }) => (
     </div>
 )
 
-const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
+const EventDetailsPage = async ({ params }: { params: { slug: string } }) => {
 
-    const { slug } = await params;
-    // const { success, message, data } = await getEventBySlug(slug);
-    const request = await fetch(`${BASE_URL}/api/events/${slug}`);
+    const { slug } = params;
+    const { success, message, data } = await getEventBySlug(slug);
 
-    // Check if request was successful before parsing JSON
-    if (!request.ok) {
+    if (!success || !data?.event) {
         return notFound();
     }
 
-    const data = await request.json();
+    const {
+        event: {
+            _id,
+            title,
+            description,
+            image,
+            overview,
+            venue,
+            location,
+            date,
+            time,
+            mode,
+            audience,
+            agenda,
+            organizer,
+            tags,
+        },
+    } = data;
 
-
-    const { event: { _id, title, description, image, overview, venue, location, date, time, mode, audience, agenda, organizer, tags, } } = data;
+    // const request = await fetch(`${BASE_URL}/api/events/${slug}`);
+    // // Check if request was successful before parsing JSON
+    // if (!request.ok) {
+    //     return notFound();
+    // }
+    // const data = await request.json();
+    // const { event: { _id, title, description, image, overview, venue, location, date, time, mode, audience, agenda, organizer, tags, } } = data;
 
     // Validate required fields
     if (!description || !title) {
@@ -121,8 +141,10 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
                             ) : (
                                 <p className="text-sm">Be the first to book! Discount available for first 10 bookings.</p>)
                         }
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <BookEvent eventId={_id.toString()} slug={slug} />
+                        </Suspense>
 
-                        <BookEvent eventId={_id.toString()} slug={slug} />
 
                     </div>
 
