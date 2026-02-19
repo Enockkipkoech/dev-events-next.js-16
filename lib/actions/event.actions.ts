@@ -5,12 +5,12 @@ import connectDB from "../mongodb";
 import { cacheLife, cacheTag } from "next/cache";
 
 export const getSimilarEventsBySlug = async (slug: string) => {
-    try {
-        "use cache";
-        cacheTag("similar-events");
-        cacheLife("minutes");
-        await connectDB();
+    "use cache";
+    cacheTag("similar-events");
+    cacheLife("minutes");
 
+    try {
+        await connectDB();
         const event = await Event.findOne({ slug });
         const similarEvents = await Event.find({ _id: { $ne: event._id }, tags: { $in: event.tags } }).lean();
 
@@ -27,11 +27,11 @@ export const getSimilarEventsBySlug = async (slug: string) => {
 };
 
 export const getEventBySlug = async (slug: string) => {
-    try {
-        "use cache";
-        cacheTag("events");
-        cacheLife("minutes");
+    "use cache";
+    cacheTag("events");
+    cacheLife("minutes");
 
+    try {
         await connectDB();
         const event = await Event.findOne({ slug }).lean();
         return { success: true, message: 'Event fetched successfully', data: event };
