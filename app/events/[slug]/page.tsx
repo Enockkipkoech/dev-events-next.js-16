@@ -41,14 +41,20 @@ const EventTag = ({ tags }: { tags: string[] }) => (
     </div>
 )
 
-const EventDetailsPage = async ({ params }: { params: { slug: string } }) => {
+const EventDetailsPage = async ({ params }: { params: { slug: string }}) => {
 
     const { slug } = params;
+
     const { success, message, data } = await getEventBySlug(slug);
+
+
 
     if (!success || !data?.event) {
         return notFound();
     }
+    console.log(`Event Data Prototype:`,
+        Object.getPrototypeOf(data.event)
+    );
 
     const {
         event: {
@@ -78,9 +84,9 @@ const EventDetailsPage = async ({ params }: { params: { slug: string } }) => {
     // const { event: { _id, title, description, image, overview, venue, location, date, time, mode, audience, agenda, organizer, tags, } } = data;
 
     // Validate required fields
-    if (!description || !title) {
-        return notFound();
-    }
+    // if (!description || !title) {
+    //     return notFound();
+    // }
 
     // Safely parse agenda - handle missing, non-array, or malformed agenda
     const agendaArray: string[] = Array.isArray(agenda) ? agenda : (typeof agenda === 'string' ? [agenda] : []);
@@ -90,8 +96,8 @@ const EventDetailsPage = async ({ params }: { params: { slug: string } }) => {
     const bookings = 20; // Placeholder for number of bookings - replace with actual data when available
     const availabeSpots = 50;
 
-    const rawSimilarEvents: IEvent[] = (await getSimilarEventsBySlug(slug)).data || [];
-    const similarEvents: IEvent[] = JSON.parse(JSON.stringify(rawSimilarEvents));
+    const similarEventsResult = await getSimilarEventsBySlug(slug);
+    const similarEvents: IEvent[] = (Array.isArray(similarEventsResult.data) ? [] : similarEventsResult.data?.similarEvents) || [];
 
     return (
         <section id="event">
