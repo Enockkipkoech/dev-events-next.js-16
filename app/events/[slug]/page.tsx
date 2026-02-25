@@ -2,6 +2,7 @@ import BookEvent from '@/components/BookEvent';
 import EventCard from '@/components/EventCard';
 import { IEvent } from '@/database';
 import { getEventBySlug, getSimilarEventsBySlug } from '@/lib/actions/event.actions';
+import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { Suspense } from "react";
 
@@ -41,9 +42,11 @@ const EventTag = ({ tags }: { tags: string[] }) => (
     </div>
 )
 
-const EventDetailsPage = async ({ params }: { params: { slug: string }}) => {
-
-    const { slug } = params;
+const EventDetailsPage = async ({ params }: { params: { slug: string } }) => {
+    "use cache";
+    cacheTag("event-details");
+    cacheLife("hours");
+    const { slug } = await params;
 
     const { success, message, data } = await getEventBySlug(slug);
 
